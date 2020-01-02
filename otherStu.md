@@ -1,6 +1,6 @@
 # 乱七八糟的学习
 
-## 前端之巅-大部分教程不会告诉你的12个JS技巧-2019.04.14
+## 一、前端之巅-大部分教程不会告诉你的12个JS技巧-2019.04.14
 
 ### 一、过滤唯一值
 
@@ -98,7 +98,7 @@ arr.slice(-2);      //输出数组的最后两个数
 ```
 
 
-## git 起冲突的代码操作
+## 二、git 起冲突的代码操作
 
 ```bash
 git stash
@@ -106,7 +106,7 @@ git pull
 git stash pop
 ```
 
-## 淘宝静态页面开发
+## 三、淘宝静态页面开发
 
 ### ul li
 
@@ -116,11 +116,11 @@ git stash pop
 
 `list-style-position`: 项目符号在列表中显示位置的属性 `outside \ inside`
 
-## border
+## 四、border
 
 `border-sizing: border-box`: 边框在盒子内部呈现，不占用外部的 px;
 
-## Javascript之把网页加入收藏夹功能
+## 五、Javascript之把网页加入收藏夹功能
 
 ```js
 <script>
@@ -136,3 +136,107 @@ function addFav(){
  
 <a href="#" rel="sidebar" onclick="addFav();">加入收藏</a></div>
 ```
+
+## 六、H5 调原生方式
+
+### 第一种：
+
+判断是 ios 还是 android:
+
+```js
+var pattern_phone = new RegExp("iphone", "i");
+var userAgent = navigator.userAgent.toLowerCase();
+var isIphone = pattern_phone.test(userAgent);
+```
+
+关于附件下载，如果是ios:
+
+```js
+window.webkit.messageHandlers.openFileFlow.postMessage({ filepath: 'aa' });
+```
+
+安卓的话可以不走原生，直接： `window.location.href`
+
+### 第二种：走 corodva~插件
+
+```js
+export function getLocationInfoFromNative() {
+      return new Promise((resolve, reject) => {
+            const callback = (addr) => {
+            resolve(addr);
+            }
+            try{
+            const NativePlugin = cordova.plugins.NativePlugin;
+            NativePlugin.getLocationInfo(callback);
+            } catch(e) {}
+      })
+}
+```
+
+在 `corodva_plugin` 文件夹下导出方法
+
+```ts 
+interface NativePlugin {
+  getLocationInfo: (callback: ((addr: string) => void)) => void;
+  goToCheckMenu: () => void;
+}
+```
+
+最后在 ios 和 android 包下进行配置：
+
+`NativePlugin.m` 和 `NativePlugin.java`:
+
+```ts
+- (void)getLocationInfo:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *result = nil;
+    NSDictionary *addr = @{@"addr": @"1"};
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:addr];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)goToCheckMenu:(CDVInvokedUrlCommand *)command {
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+```
+
+```ts
+private void goToCheckMenu(CallbackContext callback) {
+      JSONObject addr = new JSONObject();
+      PluginResult result = new PluginResult(PluginResult.Status.OK);
+      callback.sendPluginResult(result);
+}
+
+private void getLocationInfo(CallbackContext callback) {
+      JSONObject addr = new JSONObject();
+      String addr = 
+      try {
+      addr.put("addr", "1");
+      } catch (JSONException e) {
+      e.printStackTrace();
+      }
+      PluginResult result = new PluginResult(PluginResult.Status.OK, addr);
+      callback.sendPluginResult(result);
+}
+```
+
+
+## 七：修改 input 输入框 placeHolder 的方法
+
+```less
+.am-input-control input {
+      color: #fff;
+      text-align: left;
+      background-color: transparent;
+      &::placeholder {
+      // 自定义样式
+      color: #fff;
+      }
+}
+```
+
+
+
+
+
+
