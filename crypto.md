@@ -56,6 +56,56 @@ var decrypted = aesDecrypt(encrypted, key); // 解密后的数据，可以 conso
 AES 有很多不同的算法： `aes192`，`aes-128-ecb`，`aes-256-cbc`等
 
 
+### 关于 AES-ECB-Pkcs7
+
+```js
+import CryptoJS from 'crypto-js';
+
+const aesKey = '1234567890123456';
+
+export const fillKey = key => {
+  const filledKey = Buffer.alloc(128 / 8);
+  const keys = Buffer.from(key);
+  if (keys.length < filledKey.length) {
+    filledKey.map((b, i) => (filledKey[i] = keys[i]));
+  }
+  return filledKey;
+};
+
+export const aesEncrypt = word => {
+  const key = CryptoJS.enc.Utf8.parse((aesKey)); //16位
+  let encrypted = '';
+  if (typeof word == 'string') {
+    let srcs = CryptoJS.enc.Utf8.parse(word);
+    encrypted = CryptoJS.AES.encrypt(srcs, key, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+  } else if (typeof word === 'object') {
+    //对象格式的转成json字符串
+    let data = JSON.stringify(word);
+    let srcs = CryptoJS.enc.Utf8.parse(data);
+    encrypted = CryptoJS.AES.encrypt(srcs, key, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+  }
+  return encrypted.toString();
+};
+
+export const aesDecrypt = word => {
+  let key = CryptoJS.enc.Utf8.parse((aesKey));
+  let decrypt = CryptoJS.AES.decrypt(word, key, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return decrypt.toString(CryptoJS.enc.Utf8);
+};
+
+```
+
+
+
 
 
 

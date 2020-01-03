@@ -185,6 +185,103 @@ fs.createReadStream('aa.txt.gz')
 console.log('解压完成');
 ```
 
+## 七、路由
+
+获取url: `req.url`
+
+获取url的全部参数：`arg = url.parse(req.url).query`
+
+将url参数转化成对象：`querystring.parse(arg)` querystring 可以引入
+
+代码：
+
+```js
+var http = require('http');
+var url = require('url');
+var querystring = require("querystring");
+
+onRequest = (req, res) => {
+  var arg = url.parse(req.url).query;
+  var params = querystring.parse(arg);
+  res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+  res.write('获取url的name + 参数：' + req.url + '\n');
+  res.write('获取url的参数' + arg + '\n');
+  res.write('获取url的某个参数' + params['addr'] + '\n');
+  res.end();
+}
+http.createServer(onRequest).listen(8888);
+```
+
+## 八、全局对象
+
+`__filename`: 当前正在执行的脚本的文件名，输出文件所在位置的绝对路径
+
+`__dirname`: 当前执行脚本所在的目录
+
+## 九、util
+
+可以直接参考[官网](https://nodejs.org/api/util.html)
+
+```js
+const util = require('util');
+
+util.inspect()  // 将对象转换成字符串的方法
+```
+
+## 十、GET/POST 请求
+
+### 1、get 请求
+
+参数可以通过 url 进行获取
+
+### 2、post 请求
+
+通过 `req.on` 来监听数据
+
+```js
+var http = require('http');
+var querystring = require('querystring');
+
+http.createServer((req, res) => {
+    let body = '';
+    req.on('data', (val) => {
+        body += val;
+    })
+    req.on('end', () => {
+        body = querystring.parse(body);
+        res.writeHead(200, {'Content-Type': 'text/html; charset=utf8'});
+        res.write(body);
+    })
+}).listen(3000);
+```
+
+## 十一、工具模块
+
+### 1、OS模块
+
+基本的系统操作函数
+
+`os`: [官网地址](https://nodejs.org/api/os.html)
+
+### 2、path模块
+
+处理文件路径
+
+`path`: [官网地址](https://nodejs.org/api/path.html)
+
+```js
+path.join('/text1', 'text2', 'text3') // 拼接路径 ‘text1/text2/text3’
+
+path.resolve('main.js');            // 获取该文件的绝对路径
+
+path.resolve('/foo/bar', '/tmp/file/');     // 第一个文件到第二个文件的绝对路径
+```
+
+### 3、net模块
+
+
+
+
 
 
 
