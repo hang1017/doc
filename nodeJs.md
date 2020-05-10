@@ -19,6 +19,7 @@ var http = require('http');
 var fs = require('fs');
 var events = require('events');
 
+// 创建服务器
 http.createServer(function (request, response) {
 
     response.writeHead(200, {'Content-Type': 'text/plain'});
@@ -278,6 +279,314 @@ path.resolve('/foo/bar', '/tmp/file/');     // 第一个文件到第二个文件
 ```
 
 ### 3、net模块
+
+用于底层的网络通信的小工具，包含了创建服务端和客户端的方法
+
+笔记代码在 node 包中。
+
+## 十二、Web 模块
+
+### 1、web 服务器
+
+web 服务器指网站服务器，其基本功能就是提供web信息浏览服务，只需支持 http协议，html文档格式，url。与客户端网络浏览器配合。
+
+首先先创建一个简单的 `index.html` 页面。
+
+其次开始 node 服务端代码编写
+
+```js
+var http = require('http');
+var fs = require('fs');
+var url = require('url');
+
+http.createServer((request, response) => {
+    const pathname = url.parse(request.url).pathname;
+    // 输出请求的文件名
+   console.log("Request for " + pathname + " received.");
+
+    fs.readFile(pathnam.substr(1), (err, value) => {
+        if(err) {
+            response.writeHead(404, {'Content-Type': 'text/html'});
+        } else {
+            response.writeHead(200, {'Content-Type': 'text/html'});
+            response.write(value.toString());
+        }
+        response.end();
+    })
+}).listen(8080);
+
+console.log('Server running at http://127.0.0.1:8080/');
+```
+
+启动服务，输入 `http://localhost:8080/index.html`
+
+### 2、客户端
+
+```js
+var http = require('http');
+
+const options = {
+    host: 'localhost',
+    port: '8080',
+    path: '/index.html'
+}
+
+const callBack = (response) => {
+    let body = '';
+    response.on('data', (val) => {
+        body += val;
+    })
+    response.on('end', () => {
+        console.log(body);
+    })
+}
+
+const request = http.request(options, callBack);
+req.end();
+```
+
+## 十三、Express 框架
+
+### 1、基础使用
+
+安装各种依赖：
+
+```bath
+yarn 
+yarn add express
+yarn add body-parser
+yarn add cookie-parser
+yarn add multer
+```
+
+```js
+var express = require('express');
+var app = express();
+
+app.get('/', (req, res) => {
+    res.send('hello world');
+})
+
+var server = app.listen(8080, () => {
+    var host = server.address().address;
+    var port = server.address().port;
+    console.log(host, port);
+})
+```
+
+框架用法如果有需要请参考[菜鸟教程](https://www.runoob.com/nodejs/nodejs-express-framework.html)
+
+### 2、显示静态文件
+
+使用 `app.use('/public', express.static('public'))` 进行处理静态文件的功能
+
+在上面的代码基础上增加：
+
+```js
+app.use('/public', express.static('public'));
+```
+
+在浏览器上输入路径即可展示静态文件。
+
+### 3、路由(get)
+
+通过 form 表单进行页面跳转，通过 get 进行参数传递。
+
+```js
+var express = require('express');
+var app = express();
+
+app.get('/index.html', (req, res) => {              // 进行form 表单的页面展示
+    app.readFile(__dirname + '/index.html');
+})
+
+app.get('/formSubmit', (req, res) => {              // 读 url 的数据
+    const response = {
+        'first_name': req.query.first_name,
+        'second_name': req.query.second_name,
+    }
+    console.log(response);  
+    res.send(JSON.stringify(response));
+})
+
+var server = app.listen(8080, () => {
+    host = server.address().address;
+    port = server.address().port;
+    console.log(host, port);
+})
+```
+
+### 4、路由(post)
+
+通过 form 表单进行页面跳转，通过 post 进行参数传递
+
+```js
+var express = require('express');
+var app = express();
+var bodyParser = require('bodyParser');
+
+// 创建 application/x-www-form-urlencoded 编码解析
+var urlEncodedParser = bodyParser.urlencoded({ extended: false }); // 这个很重要，不写会报错
+
+app.get('/index.html', (req, res) => {
+    app.readFile(__dirname + '/index.html')
+})
+
+app.post('formPostSubmit', urlEncodedParser, (req, res) => {
+    const response = {
+        'first_name': req.body.first_name,
+        'second_name': req.body.second_name,
+    }
+    console.log(response);
+    res.send(JSON.stringify(response));
+})
+```
+
+### 5、文件上传
+
+```js
+var express = require('express');
+var bodyParser = require('bodyParser');
+var multer = require('multer');
+var fs = require('fs');
+var app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({ dest: '/tmp/' }).array('img'));        // 这里的 array 要和html 的 filename 保持一致，不然会报错
+
+app.post('uploadFile', (req, res) => {
+    res.writeHead(200,{'Content-Type':'text/html;charset=utf-8'});//设置response编码为utf-8
+    console.log(req.files);  // 上传的文件信息
+    var des_name = __dirname + '/' + req.files[0].originalname;
+    fs.readFile(req.files[0].path, 'utf-8', (err, data) => {
+        res.end(data);
+        console.log(data.toString());
+        fs.writerFile(des_name, data, (err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                response = {
+                filename: req.files[0].originalname
+                };
+                console.log(response);
+                res.end(JSON.stringify(response));
+            }
+        })
+    })
+})
+```
+
+写个步骤：
+
+- 先在上传后能够保持页面的正常跳转
+- 能够读取到上传的文件内容
+- 将内容写入到新的文件中。
+
+## 十四、RESTful 
+
+REST 表述性状态传递
+
+REST 的四个基本方法：
+
+- get: 用于获取数据
+- put: 用于更新或添加数据
+- delete: 用于删除数据
+- post: 用于添加数据
+
+使用步骤：
+
+首先创建一个 `user.json` 数据存放一点内容进去
+
+```json
+{
+  "user1": {
+    "name": "hang1",
+    "age": "11"
+  }
+}
+```
+
+```js
+var express = require('express');
+var fs = require('fs');
+var app = express();
+
+let user = {
+    user4: {
+        "name": "hang4",
+        "age": "14"
+    }
+}
+
+app.get('/user', 'utf-8', (req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html;charsetutf-8" });
+    fs.readFile(__dirname + '/user.json', 'utf-8', (err, data) => {
+        let newData = JSON.parse(data);
+        newData['user4'] = user['user4'];
+        delete newData['user1'];
+        res.end(JSON.stringify(newData));
+    })
+})
+
+var server = app.listen(8080, () => {
+    const host = server.address().address;
+    const port = server.address().port;
+    console.log(host, port);
+})
+```
+
+## 十五、express 框架(pug)
+
+```bash
+express --view=pug
+```
+
+`yarn` 后即可启动。
+
+```js
+// 用于配置页面文件的 `.ejs`文件 的根目录
+app.set('views', path.join(__dirname, 'views'));
+// 用于配置静态文件 `js css` 的根目录
+app.use(express.static(path.join(__dirname, 'public')));
+```
+
+对于每次修改代码都要重启项目的烦恼，可以安装 `nodemon` 较为简便的自动化工具。
+
+```bash
+# 全局安装 nnodemon
+sudo npm install -g nodemon
+
+# 在项目中安装 nodemon
+npm install --save-dev nodemon
+```
+
+`package.json` 文件定义依赖项和其他信息，以及一个调用应用入口（/bin/www，一个 JavaScript 文件）的启动脚本，
+
+脚本中还设置了一些应用的错误处理，加载 app.js 来完成其余工作。
+
+/routes 目录中用不同模块保存应用路由。/views 目录保存模板。
+
+`cookie-parser`: 用于解析 cookie 头来填充 `req.cookies`(提供了访问 cookie 信息的便捷方法)
+
+`morgan`: node 专用 HTTP 请求记录器中间件.
+
+`/bin/www` 文件是应用的入口, 做的第一件事就是 `require` 真实的应用入口，app.js 会设置并返回 express() 应用对象。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

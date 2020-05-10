@@ -65,6 +65,7 @@ Node Package Manager
 - `scripts`: 指定了运行脚本命令的npm命令行缩写
 - `dependencies`: 指定了项目运行所依赖的模块
 - `devDependencies`: 指定了项目开发所需要的模块
+- `unpkg`: 让 npm 上所有的文件都开启 cdn 服务
 
 ### 创建 `package.json` 的两种方法
 
@@ -124,6 +125,14 @@ Node Package Manager
 如何更新版本号
 
 `npm version <update_type>`
+
+### npm publish
+
+用于发版本所用。如果名称前面带了 `@`, 说明这是私有团队包，所以需要公开 `public`，
+ 
+```bash
+npm publish --access publish
+```
 
 ## 如何使用语义化版本
 

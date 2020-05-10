@@ -235,6 +235,148 @@ private void getLocationInfo(CallbackContext callback) {
 }
 ```
 
+## 八、alitaJs 动态表单库
+
+1、`less` 文件中不要写 `rem`
+
+2、通过父控件获取到的参数可以通过 `...otherProps` 往下进行传递
+
+3、类型定义使用 `I` 做前缀
+
+4、git 提交说明规范
+
+```js
+const commitRE = /^(revert: )?(feat|fix|docs|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release|dep)(\(.+\))?: .{1,50}/;
+```
+
+5、引用某个库的类型定义的转化可以有以下写法(说不清楚，直接看代码吧)
+
+```js
+modeType?: DatePickerPropsType['mode'];
+```
+
+6、其他类型的强定义规范
+
+```js
+export interface INomarInputProps extends InputItemPropsType {
+      inputType: InputItemPropsType['type'];
+      coverStyle?: React.CSSProperties;
+      imgExtraClick?: (e: React.MouseEvent<HTMLElement>) => void;
+}
+```
+
+7、在 `interface` 通过 `extends` 扩展时，`Omit<INomarInputProps, 'inputType'>` 可以剔除调某些必须定义到的属性，多属性可以用 `[]`
+
+## 九、commonjs 为什么没有按需加载？
+
+[聊聊 `package.json` 中的 `module` 字段](https://loveky.github.io/2018/02/26/tree-shaking-and-pkg.module/)
+
+模块只能通过 `exports` 对象向外暴露属性。所以要暴露的方法、变量都只能作为 `exports` 对象的一个属性出现。
+
+`ES6` 出现后，其中的 `import` 和 `export` 都是静态的，意味着一个模块要引入或者暴露的所有方法，在编译阶段就全部确定了。所以打包阶段可以知道哪些模块未被使用，可以用 `bundle` 文件中剔除掉。减少 `bundle` 文件大小，提高脚本执行速度。
+
+`babel` 打包的代码会屏蔽掉 `node_modules` 目录下的文件。如果用户是基于 `ES6` 的规范发布的包，就必须配置复杂的屏蔽规则将我们的包加入编译的白名单。
+
+`pkg.main` 字段指向的是编译后的 `ES5` 版本的代码。
+
+`pkg.module` 字段要指向的是**基于 `ES6` 模块规范的 `ES5` 语法书写的模块**
+
+ES6模块可以享受按需加载的好处， ES5 为了用户在配置 babel 插件的时候可以放心屏蔽 `node_modules` 目录。
+
+## 十、图片增加水印
+
+```js
+/**
+   * 图片添加水印
+   */
+  picWaterMark = ({
+      url = '',
+      textAlign = 'left',
+      textBaseline = 'middle',
+      font = "30px Microsoft Yahei",
+      fillStyle = 'rgba(255, 255, 255, 0.8)',
+      content = '请勿外传',
+      content2 = '请勿外传',
+      cb = null,
+    } = {}) => {
+      const img = new Image();
+      img.src = url;
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        let imageWidth = img.width / 2;   //压缩后图片的宽度，这里设置为缩小一半
+        let imageHeight = img.height / 2;
+        canvas.width = imageWidth;
+        canvas.height = imageHeight;
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(img, 0, 0, imageWidth, imageHeight);
+        ctx.textAlign = textAlign;
+        ctx.textBaseline = textBaseline;
+        ctx.font = font;
+        ctx.fillStyle = fillStyle;
+        ctx.fillText(content, 10, 20);
+        ctx.fillText(content2, 10, 50);
+        let base64Url = '';
+        let size = Math.round(url.length/1024*100)/100;
+        console.log(size);
+        if(size < 1200) {
+          base64Url = canvas.toDataURL();
+        } else {
+          console.log(parseFloat((1200/size).toFixed(1)));
+          base64Url = canvas.toDataURL("image/jpeg", parseFloat((1200/size).toFixed(1)));
+        }
+        // const base64Url = canvas.toDataURL();
+        
+        cb && cb(base64Url);
+      }
+      
+  }
+```
+
+## 十一、iframe 打开页面样式错乱问题
+
+```js
+// 设置iframe页面的meta
+export function resetIframeViewPort() {  
+    try {
+        const meta = document.querySelector('meta[name="viewport"]');
+        window._contentBackUp = meta.getAttribute('content');
+        const scale = window._contentBackUp.split('initial-scale=')[1].split(',')[0];
+        meta.setAttribute('content', 'user-scalable=no, initial-scale=1.0, maximum-scale=1.0 minimal-ui');
+        const html = document.querySelector('html');
+        window._fontSize = html.style.fontSize;
+        html.style.fontSize = window._fontSize.split('px')[0] * scale + 'px';
+    } catch (error) {
+        console.log('tool_setIframeViewPort', error);
+    }
+    
+}
+
+// 还原iframe页面的meta
+export function backIframeViewPort() {  
+    try {
+        // 容错
+        if (window._fontSize && window._contentBackUp) {
+            const meta = document.querySelector('meta[name="viewport"]');
+            meta.setAttribute('content', window._contentBackUp);
+            const html = document.querySelector('html');
+            html.style.fontSize = window._fontSize;
+        }
+    } catch (error) {
+        console.log('tool_backIframeViewPort', error);
+    }
+}
+```
+
+## 十二、本地部署测试
+
+1、yarn buid  
+2、yarn global add serve 
+3、cd dist 
+4、serve 
+5、浏览器访问http://localhost:5000/
+
 
 
 
