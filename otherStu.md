@@ -377,6 +377,58 @@ export function backIframeViewPort() {
 4、serve 
 5、浏览器访问http://localhost:5000/
 
+## 十三、王志翔前端知识体系
+
+### 1、运行机制
+
+`JavaScript` 语言是单线程,同一个时间只做一件事。
+
+任务队列：
+
+任务需排队，很多时候因为IO设备(网络读取数据)很慢，导致堵塞情况。
+
+主线程的任务可以不管IO设备，挂起等待中的任务，继续往下执行。
+
+所以任务分为两种：
+
+- 宏任务：在主线程上排队执行的任务。
+- 微任务：不进入主线程，而是进入任务队列(先进先出)，只有任务队列通知主线程，某个微任务可以执行了，才进入主线程执行。
+
+- 常见的宏任务队列 比如：setTimeout、setInterval、script（整体代码）、 I/O 操作、UI 渲染等。
+- 常见的微任务队列 比如: new Promise().then(回调)、MutationObserver(html5新特性) 等。
+
+### 2、惰性函数
+
+编写一个方法，方法返回第一次执行的内容。
+
+```js
+var foo = function() {
+  var t = new Date();
+  foo = function() {
+      return t;
+  };
+  return foo();
+}
+```
+
+适用场景：
+
+- 固定不变，一次判定，在固定的应用环境中不会发生改变
+- 比如对浏览器做能力检测
+
+## 十四、serve 本地服务部署
+
+如果打包后文件没有增加，可以尝试修改test，如果打包后，部署页面空白，可以尝试修改priority。本地部署调试方式是
+1、yarn buid  
+2、yarn global add serve 
+3、cd dist 
+4、serve 
+5、浏览器访问http://localhost:5000/
+
+
+
+
+
 
 
 
