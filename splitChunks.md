@@ -58,15 +58,15 @@ export default {
       minSize: 30000,
       minChunks: 1,
       cacheGroups: {
-        vendors: {
-          name: 'vendors',
-          test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|lodash|lodash-decorators|redux-saga|re-select|dva|moment)[\\/]/,
-          priority: -10,
-          enforce: true,
-        },
         echarts: {
           name: 'echarts',
           test: /[\\/]node_modules[\\/](echarts)[\\/]/,
+          priority: -9,
+          enforce: true,
+        },
+        vendors: {
+          name: 'vendors',
+          test: /[\\/]node_modules[\\/]/,
           priority: -11,
           enforce: true,
         },
@@ -83,7 +83,7 @@ export default {
 
 - `name`: 拆分块的名称，提供字符串或函数使您可以使用自定义名称,如果 `name` 与 `chunks` 名称匹配，则进行拆分。
 - `test`: 正则匹配路径，符合入口的都会被拆分，装到 `name` 名称下的包中。
-- `priority`: 拆包的优先级，越小优先级越高。
+- `priority`: 拆包的优先级，越大优先级越高。**顺序很重要**，先把大包分出去，在将剩余的 `node_modules` 分成 `vendors` 包。
 - `enforce`: 不管这个包的大小，都会进行分包处理。
 
 现在我们再执行 `ANALYZE=1 umi build` 看看效果：
@@ -99,7 +99,7 @@ antdm: {
   name: 'antdm',
   chunks: 'all',
   test: /[\\/]node_modules[\\/](@ant-design|antd|antd-mobile)[\\/]/, // 这里模拟有 antd 的情况，请根据实际项目具体考虑分析
-  priority: -12,
+  priority: -10,
   enforce: true,
 },
 ```

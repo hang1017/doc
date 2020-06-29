@@ -1,10 +1,10 @@
 # 面试题
 
-## webpck
+## 一、webpck
 
 webpack 的面试题在同级目录下的 `webpack.md` 中的最下方。
 
-## 基础题
+## 二、基础题
 
 ### 1、什么是闭包
 
@@ -104,7 +104,63 @@ media:
 
 `.container .abc {background:#fff}`
 
-### 5、react 的 key 有什么作用
+### 5、opacity: 0, visibility: hidden, display: none
+
+`display`: 会让元素从渲染树中消失，渲染时不占任何空间，不可点击。子孙一起消失，会回流，性能消耗最大
+
+`visibility`: 在渲染树中不会消失，继续占据空间，只是不可点击。子孙可以呈现出来
+
+`opacity`: 渲染树不会消失，继续占据空间，可点击，只是不可见。子孙一起消失
+
+### 6、不改变原代码的情况下,如何修改让图片保持 300px
+
+1、设置 `max-width: 300px`
+
+2、设置按比例缩放图片 `transform: scale(0.625)`
+
+3、document.getElementByTagName('img')[0].setAttribute('style','width:300px !important');
+
+
+### 7、['10', '10', '10', '10'].map(parseInt)
+
+实际向 `parseInt` 传递的是字符串和基数。
+
+所以其执行的效果是：
+
+- parseInt('10',0);  
+- parseInt('10',1);
+- parseInt('10',2);
+- parseInt('10',3);
+
+输出结果： 1，NaN，NaN
+
+### 8、全局作用域中，const let 声明的变量在哪里
+
+在全局作用域中，let 和 const 声明的全局变量并没有在全局对象中。而是在一个 块级作用域(Script)中。
+
+### 9、使用 sort 对数组进行排序
+
+`[102, 15, 22, 29, 3, 8]`
+
+根据 MDN 上对 `Array.sort()` 的解释，默认的排序会讲数组元素转换为字符串，比较字符串中 UTF-16编码顺序进行排序。
+
+
+### 10、打印对称树
+
+```js
+var result = [];
+for(let i = 0;i< 10; i++) {
+  result.push(i*11);
+  for(let j = 0; j<10; j++) {
+    result.push(i*101 + j*10);
+    result.push(i*1001 + j*110);
+  }
+}
+```
+
+## 三、react
+
+### 1、react 的 key 有什么作用
 
 react 中 diff算法来保证每次组件的所有变动都能得到及时的更新，标准的Tree Diff算法复杂度为O(n3)，若组件中的元素数量过多的话，其性能是无法承受的。
 
@@ -144,7 +200,7 @@ data.forEach((item)=>{
 - 尽量不要用 index 去作为 key
 - 不要时试图加上不稳定的 key ，这样只会让性能更糟糕。
 
-### 6、context
+### 2、context
 
 (1)、什么是 context
 
@@ -173,7 +229,7 @@ static contextType = ThemeContext;
 return <Button theme={this.context} />
 ```
 
-### 7、render props
+### 3、render props
 
 (1)、什么是 render props
 
@@ -199,49 +255,7 @@ render(){
 
 当两个平级组件需要单向依赖的时候。
 
-## 一题汇总题目
-
-### 1、opacity: 0, visibility: hidden, display: none
-
-`display`: 会让元素从渲染树中消失，渲染时不占任何空间，不可点击。子孙一起消失，会回流，性能消耗最大
-
-`visibility`: 在渲染树中不会消失，继续占据空间，只是不可点击。子孙可以呈现出来
-
-`opacity`: 渲染树不会消失，继续占据空间，可点击，只是不可见。子孙一起消失
-
-### 2、不改变原代码的情况下,如何修改让图片保持 300px
-
-1、设置 `max-width: 300px`
-
-2、设置按比例缩放图片 `transform: scale(0.625)`
-
-3、document.getElementByTagName('img')[0].setAttribute('style','width:300px !important');
-
-
-### 3、['10', '10', '10', '10'].map(parseInt)
-
-实际向 `parseInt` 传递的是字符串和基数。
-
-所以其执行的效果是：
-
-- parseInt('10',0);  
-- parseInt('10',1);
-- parseInt('10',2);
-- parseInt('10',3);
-
-输出结果： 1，NaN，NaN
-
-### 4、全局作用域中，const let 声明的变量在哪里
-
-在全局作用域中，let 和 const 声明的全局变量并没有在全局对象中。而是在一个 块级作用域(Script)中。
-
-### 5、使用 sort 对数组进行排序
-
-`[102, 15, 22, 29, 3, 8]`
-
-根据 MDN 上对 `Array.sort()` 的解释，默认的排序会讲数组元素转换为字符串，比较字符串中 UTF-16编码顺序进行排序。
-
-### 6、setState 什么时候更新
+### 4、setState 什么时候更新
 
 `setState` 是同步执行的，这里说的的同步异步问题是指：是否会立即执行，还是或者会多个 state 合并到一起批量执行。
 
@@ -249,18 +263,42 @@ render(){
 
 当 react 在自身生命周期内时，触发 isBatchingUpdates = true, 所以不会直接更新 state.
 
-### 打印对称树
+### 5、讲讲 React 生命周期？React v15 和 React v16 生命周期有啥变化？
 
-```js
-var result = [];
-for(let i = 0;i< 10; i++) {
-  result.push(i*11);
-  for(let j = 0; j<10; j++) {
-    result.push(i*101 + j*10);
-    result.push(i*1001 + j*110);
-  }
-}
-```
+react15 生命周期
+
+![img](assets/../gitImg/interview/3-5-1.png)
+
+挂载组件流程：`constructor` -> `componentWillMount` -> `render` -> `componentDidMount`
+
+修改 `props` 数据流程: `componentWillReceiveProps` -> `shouldComponentUpdate` -> `componentWillUpdate` -> `render` -> `componentDidUpdate`
+
+修改 `state` 数据流程: `shouldComponentUpdate` -> `componentWillUpdate` -> `render` -> `componentDidUpdate`
+
+![img](assets/../gitImg/interview/3-5-2.png)
+
+挂载组件流程: `constructor` -> `getDerivedStateFromProps` -> `render` -> `componentDidMount`
+
+修改 `props` 数据流程: `getDerivedStateFromProps` -> `shouldComponentUpdate` -> `render` -> `getSnapshotBeforeUpdate` -> `componentDidUpdate`
+
+修改 `state` 数据流程: 同上
+
+**对比：**
+
+- 弃用了 `componentWillMount`、`componentWillReceivePorps`，`componentWillUpdate`
+- 新增 `getDerivedStateFromProps`、`getSnapshotBeforeUpdate`
+- 17版本将会删除弃用的三个生命周期
+
+### 6、shouldComponentUpdate 是做什么的？如何用？
+
+询问组件是否需要更新的一个钩子函数，判断数据是否需要重新渲染，返回一个布尔值。默认的返回值是true，需要重新render()。
+
+若如果返回值是false则不触发渲染,利用这个生命周期函数可以强制关闭不需要更新的子组件来提升渲染性能。
+
+这个方法用来判断是否需要调用 render 方法重新描绘 dom。
+
+因为 dom 的描绘非常消耗性能，如果我们能在 shouldComponentUpdate 方法中能够写出更优化的 dom diff 算法，可以极大的提高性能。
+
 
 
 
