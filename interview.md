@@ -158,6 +158,10 @@ for(let i = 0;i< 10; i++) {
 }
 ```
 
+### 11、实现全屏的方法
+
+给要全屏的 `div` 加上 ref, `rootRef.current.requestFullscreen();` 即可实现。
+
 ## 三、react
 
 ### 1、react 的 key 有什么作用

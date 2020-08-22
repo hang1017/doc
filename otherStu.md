@@ -425,6 +425,12 @@ var foo = function() {
 4、serve 
 5、浏览器访问http://localhost:5000/
 
+## 十五、ProTable study
+
+### 1、实现全屏的方法
+
+给要全屏的 `div` 加上 ref, `rootRef.current.requestFullscreen();` 即可实现。
+
 
 
 
