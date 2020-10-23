@@ -52,7 +52,7 @@
 
 1、学习微信小程序的开发(3天半)。
 
-可以观看 陈小聪师傅 关于[小程序入门的博客](https://blog.csdn.net/onil_chen/article/details/71630134)
+可以观看 陈小聪 关于[小程序入门的博客](https://blog.csdn.net/onil_chen/article/details/71630134)
 
 上面的博客是一整个系列。但是因为博客时间比较久远，有些知识稍微落后，所以需要集合官网进行学习，或者可以直接学习[官网的教程](https://developers.weixin.qq.com/miniprogram/dev/api/)
 
