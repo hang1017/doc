@@ -112,7 +112,140 @@
 
 在 [umi 官网-modifyRoutes](https://umijs.org/zh-CN/plugins/api#modifyroutes)，可得知：用于修改路由。
 
-## 四、
+## 四、layout 包
+
+该包为在 `config` 配置 `mobileLayout` 所用。当用户配置 `mobileLayout` 时会执行该包。
+
+1、注册 key
+
+```js
+api.describe({
+  key: 'mobileLayout',
+  config: {
+    default: {},
+    schema(joi) {
+      return joi.boolean();
+    },
+    onChange: api.ConfigChangeType.regenerateTmpFiles,
+  },
+});
+```
+
+通过 `describe` 注册 `mobileLayout` 时，看到代码中调用 `onChange` 的方法。**`onChange`: 是 `dev` 阶段配置被修改后的处理机制，默认会重启 `dev` 进程**。
+
+
+`onChange` 执行 `api.ConfigChangeType`，该方法可参考[官网](https://umijs.org/zh-CN/plugins/api#configchangetype)，**当 `config` 改变时执行**。提供以下两种方法：
+
+- `restart`: 重启 dev 进程，默认是这个。
+- `regenerateTmpFiles`: 重新生成临时文件。
+
+这里有个疑问：`config` 里配置 `mobileLayout` 修改为 `false` 则会重新编译，`.umi` 文件里就少了 `alita-layout`，这没问题。为啥我改回 `true` 就不重新编译了呢？`.umi` 文件夹里也没有重新生成 `alita-layout`。
+
+第二个疑问：`api.addRuntimePluginKey` 是做什么用的？
+
+2、编写临时文件
+
+```js
+api.onGenerateFiles(() => {
+  api.writeTmpFile({
+    path: RELATIVE_MODEL_PATH,
+    content: getModelContent(),
+  });
+})
+```
+
+先看下[官网-onGenerateFiles](https://umijs.org/zh-CN/plugins/api#ongeneratefiles)对于 `onGenerateFiles` 的解释：**生成临时文件，触发时机在 `webpack` 编译之前。**
+
+通过 `api.writeTmpFile` 将临时文件写进项目中。
+
+- `path`: 文件路径、名称
+- `content`: 文件内容
+
+我们做一个测试：可以按着上面的代码，新建一份临时模版代码。将路径`path`、内容`content` 编写后，启动项目，能够在 `/src/.umi` 文件夹下找你新建的文件。
+
+3、使用临时文件
+
+```js
+api.modifyRoutes((routes) => [
+  {
+    path: '/',
+    component: utils.winPath(
+      join(api.paths.absTmpPath || '', DIR_NAME, 'AlitaLayout.tsx'),
+    ),
+    routes,
+  },
+]);
+```
+
+因为 `layout` 为全局配置，所以要修改路由配置。
+
+最外层由临时文件 `AlitaLayout` 包裹。
+
+4、导出
+
+最后一步：导出文件下的每个属性。
+
+```js
+api.addUmiExports(() => [
+  {
+    exportAll: true,
+    source: '@alitajs/alita-layout',
+  },
+]);
+```
+
+`addUmiExports`: **添加需要 umi 额外导出的内容** [官网](https://umijs.org/zh-CN/plugins/api#addumiexports)
+
+- `exportAll`: 是否全部导出
+- `source`: 需要被导出的文件地址
+
+5、`/src/layout/index.tsx` 文件阅读
+
+这个文件在创建 `AlitaLayout.tsx` 临时模版的时候被进入。
+
+```js
+api.writeTmpFile({
+  path: join(DIR_NAME, 'AlitaLayout.tsx'),
+  content: getLayoutContent(
+    utils.winPath(join(__dirname, './layout/index.js')),
+    !!api.userConfig.keepalive,
+    isMicroApp,
+  ),
+});
+```
+
+再阅读下 `AlitaLayout.tsx` 临时文件的代码：
+
+**该文件功能为将页面级 `navBar` 配置替换到全局**
+
+```js
+return React.createElement(require('${path}').default, {
+  layoutConfig,
+  hasKeepAlive: ${hasKeepAlive},
+  ...props,
+  hideNavBar:${isMicroApp},
+})
+```
+
+可以说明，项目启动时，会新建 `alita-layout` 下的两个模版并执行。
+
+在 `AlitaLayout` 模版下，会找到依赖包中 `layout/index.tsx` 的位置并执行。
+
+接下来正式进入 `/layout/index.tsx` 文件的阅读。
+
+临时文件 `layoutState.ts` 里的方法在第四小节 `导出` 被导出到 `umi` 里。
+
+所以该文件能够从 `umi` 中导出 `getPageNavBar`, `setPageNavBar`, `setTabBarList`, `getTabBarList`, `layoutEmitter` 等方法。
+
+我们页面上调用 `setPageNavBar` 的方法，其实是执行到临时文件 `layoutState.ts` 里的方法。`layout/index.tsx` 监听到方法的执行，能够拿到最新的配置，进行更改。
+
+获取到页面级的 `navBar` 和 `tabBar`，执行 `changeNavBarConfig` 和 `changeTabBarListConfig` 方法进行替换。
+
+## 五、
+
+
+
+
 
 
 
