@@ -241,7 +241,79 @@ return React.createElement(require('${path}').default, {
 
 获取到页面级的 `navBar` 和 `tabBar`，执行 `changeNavBarConfig` 和 `changeTabBarListConfig` 方法进行替换。
 
-## 五、
+## 五、router 包
+
+`router` 提供的方法是从 `history` 带过来的。
+
+若 `alita` 要支持导出 `history` 则需要写临时文件。方法和第四小节 `layout` 包方法差不多。
+
+编写临时文件，并导出文件中的方法。
+
+```js
+api.onGenerateFiles(() => {
+  api.writeTmpFile({
+    path: RELATIVE_MODEL_PATH,
+    content: getContent(), // 为 /src/utils/getContent 的文件
+  });
+});
+
+api.addUmiExports(() => [
+  {
+    exportAll: true, 
+    source: `../${RELATIVE_MODEL}`, // 文件地址
+  },
+]);
+```
+`/src/utils/getContent` 文件里的内容自己解读即可。
+
+## 六、keepalive 包
+
+`/src/index.ts`
+
+注册 `keepalive` 配置(支持修改时生成临时文件)，写入临时文件，导出临时文件里的字段和方法。
+
+主要代码还是在生成的三个临时文件，接下来分析下三个文件的功能。
+
+1、`/keep-alive/KeepAlive.tsx`：
+
+```js
+const KeepAliveLayout = (props:any) => {
+  return React.createElement(require('${path}').default, {
+    keepalive:[${keepalive}],
+    ...props
+  })
+}
+export {KeepAliveLayout}
+```
+
+这里的 `path` 为 `KeepAliveLayout.tsx` 文件。
+
+创建 `KeepAliveLayout` 组件，将 `keepalive` 作为属性传入。
+
+2、`/keep-alive/KeepAliveLayout.tsx`：
+
+先对文件里的三个方法进行功能分析：
+
+- `isKeepPath`: 是否是 keepalive 的页面。
+- `getKeepAliveViewMap`: 获取所有 `keepalive` 的数据，并对数据结构进行改造，以 `'/path': {...props}` 的形式展示。
+- `getView`: 获取当前页面的 `keepalive` 数据。
+
+样式代码中，若是 `keepalive` 的页面放在 `rumtime-keep-alive-layout` div 下展示，若不是当前的页面则隐藏。
+
+若非 `keepalive` 的页面，放到 `rumtime-keep-alive-layout-no` div 下展示。
+
+3、`/keep-alive/KeepAliveModel.tsx`:
+
+新增 `dropByCacheKey` 方法，用户消除某个页面的 `keepalive` 状态。
+
+`LayoutInstance` 的数据在 `KeepAliveLayout.tsx` 的文件里初始化时被设置。
+
+
+
+
+
+
+
 
 
 
