@@ -139,11 +139,15 @@ api.describe({
 - `restart`: 重启 dev 进程，默认是这个。
 - `regenerateTmpFiles`: 重新生成临时文件。
 
-这里有个疑问：`config` 里配置 `mobileLayout` 修改为 `false` 则会重新编译，`.umi` 文件里就少了 `alita-layout`，这没问题。为啥我改回 `true` 就不重新编译了呢？`.umi` 文件夹里也没有重新生成 `alita-layout`。
+2、`api.addRuntimePluginKey` 是做什么用的？
 
-第二个疑问：`api.addRuntimePluginKey` 是做什么用的？
+添加运行时插件的 key。 注册runtime配置。
 
-2、编写临时文件
+当我们在 `app.ts` 上更改 `mobileLayout` 时，能够做到实时监听。
+
+
+
+3、编写临时文件
 
 ```js
 api.onGenerateFiles(() => {
@@ -309,7 +313,7 @@ export {KeepAliveLayout}
 `LayoutInstance` 的数据在 `KeepAliveLayout.tsx` 的文件里初始化时被设置。
 
 
-
+## 七、
 
 
 
