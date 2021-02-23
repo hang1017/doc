@@ -185,7 +185,7 @@ api.addHTMLScripts(() => {
 
 代码地址：https://github.com/alitajs/umi-theme-webpack-plugin/blob/master/index.js
 
-`umi-theme-webpack-plugin` 插件的作用在于 `webpack` 构建环节中，读取了 `umi` 编译后的 `css` 文件，并支持 `umi-theme-generator`。
+`umi-theme-webpack-plugin` 插件的作用在于 `webpack` 构建环节中，读取了 `umi` 编译后的 `css` 文件。
 
 `compiler.hooks.emit.tapAsync('AntDesignThemePlugin', (compilation, callback) => {})`
 
