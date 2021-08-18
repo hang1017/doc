@@ -185,6 +185,15 @@ const data = [
 
 `formsValues` 的赋值权限大于 `defaultValue`。及如果两处都有赋值的情况下，将优先使用 `formsValues` 的值。
 
+## 参与人员
+
+- 陈小聪: https://github.com/xiaohuoni
+- 薛诗东雨: https://github.com/DIYCCC
+- 陈书航: https://github.com/hang1017
+- 林君源: https://github.com/Dreamljy
+
+感谢小伙伴们大力支持～
+
 ## 结束语
 
 `v3.0` 的版本并不是结束，`dform` 的表单之路还在延续，欢迎小伙伴们能够提供更好的想法。
