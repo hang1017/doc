@@ -185,12 +185,18 @@ const data = [
 
 `formsValues` 的赋值权限大于 `defaultValue`。及如果两处都有赋值的情况下，将优先使用 `formsValues` 的值。
 
-## 参与人员
+## 集训营 第 001 期 参与人员
 
 - 陈小聪: https://github.com/xiaohuoni
 - 薛诗东雨: https://github.com/DIYCCC
 - 陈书航: https://github.com/hang1017
 - 林君源: https://github.com/Dreamljy
+
+---
+
+- `171` 次提交
+- `9,598` 行代码
+- `10` 个工作日的深夜
 
 感谢小伙伴们大力支持～
 
