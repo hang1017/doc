@@ -1,4 +1,4 @@
-# alita库 框架学习笔记
+# alita 库 框架学习笔记
 
 ## 一、generate 包
 
@@ -58,7 +58,7 @@
 
 `runGenerator` 执行命令行：`pages index`:
 
-期望(`expect`) 异步存在 `existsSync`： cwd/pages/index/index.tsx  有文件。
+期望(`expect`) 异步存在 `existsSync`： cwd/pages/index/index.tsx 有文件。
 
 测试成功后，删除测试生成的文件：`rimraf.sync(join(cwd, 'pages'));`。
 
@@ -74,10 +74,10 @@
 
 1、api.describe
 
-共提供4个方法：
+共提供 4 个方法：
 
 - `default`: 为配置的默认值，用户没有配置时取这个
-- `schema`:  用于声明配置的类型，基于 `joi`，如果你希望用户进行配置，这个是必须的，否则用户的配置无效
+- `schema`: 用于声明配置的类型，基于 `joi`，如果你希望用户进行配置，这个是必须的，否则用户的配置无效
 - `onChange`: 是 `dev` 阶段配置被修改后的处理机制，默认会重启 dev 进程，也可以修改为 `api.ConfigChangeType.regenerateTmpFiles` 只重新生成临时文件，还可以通过函数的格式自定义
 - `enableBy`: 为启用方式，默认是注册启用，可更改为 `api.EnableBy.config`，还可以用自定义函数的方式决定其启用时机（动态生效）
 
@@ -101,7 +101,6 @@
 
 删除控制台打印信息。
 
-
 ## 三、main-path 包
 
 用于配置初始页面的路径
@@ -120,7 +119,7 @@
 
 ```js
 api.describe({
-  key: 'mobileLayout',
+  key: "mobileLayout",
   config: {
     default: {},
     schema(joi) {
@@ -133,7 +132,6 @@ api.describe({
 
 通过 `describe` 注册 `mobileLayout` 时，看到代码中调用 `onChange` 的方法。**`onChange`: 是 `dev` 阶段配置被修改后的处理机制，默认会重启 `dev` 进程**。
 
-
 `onChange` 执行 `api.ConfigChangeType`，该方法可参考[官网](https://umijs.org/zh-CN/plugins/api#configchangetype)，**当 `config` 改变时执行**。提供以下两种方法：
 
 - `restart`: 重启 dev 进程，默认是这个。
@@ -141,11 +139,9 @@ api.describe({
 
 2、`api.addRuntimePluginKey` 是做什么用的？
 
-添加运行时插件的 key。 注册runtime配置。
+添加运行时插件的 key。 注册 runtime 配置。
 
 当我们在 `app.ts` 上更改 `mobileLayout` 时，能够做到实时监听。
-
-
 
 3、编写临时文件
 
@@ -155,7 +151,7 @@ api.onGenerateFiles(() => {
     path: RELATIVE_MODEL_PATH,
     content: getModelContent(),
   });
-})
+});
 ```
 
 先看下[官网-onGenerateFiles](https://umijs.org/zh-CN/plugins/api#ongeneratefiles)对于 `onGenerateFiles` 的解释：**生成临时文件，触发时机在 `webpack` 编译之前。**
@@ -172,10 +168,8 @@ api.onGenerateFiles(() => {
 ```js
 api.modifyRoutes((routes) => [
   {
-    path: '/',
-    component: utils.winPath(
-      join(api.paths.absTmpPath || '', DIR_NAME, 'AlitaLayout.tsx'),
-    ),
+    path: "/",
+    component: utils.winPath(join(api.paths.absTmpPath || "", DIR_NAME, "AlitaLayout.tsx")),
     routes,
   },
 ]);
@@ -193,7 +187,7 @@ api.modifyRoutes((routes) => [
 api.addUmiExports(() => [
   {
     exportAll: true,
-    source: '@alitajs/alita-layout',
+    source: "@alitajs/alita-layout",
   },
 ]);
 ```
@@ -209,11 +203,11 @@ api.addUmiExports(() => [
 
 ```js
 api.writeTmpFile({
-  path: join(DIR_NAME, 'AlitaLayout.tsx'),
+  path: join(DIR_NAME, "AlitaLayout.tsx"),
   content: getLayoutContent(
-    utils.winPath(join(__dirname, './layout/index.js')),
+    utils.winPath(join(__dirname, "./layout/index.js")),
     !!api.userConfig.keepalive,
-    isMicroApp,
+    isMicroApp
   ),
 });
 ```
@@ -263,11 +257,12 @@ api.onGenerateFiles(() => {
 
 api.addUmiExports(() => [
   {
-    exportAll: true, 
+    exportAll: true,
     source: `../${RELATIVE_MODEL}`, // 文件地址
   },
 ]);
 ```
+
 `/src/utils/getContent` 文件里的内容自己解读即可。
 
 ## 六、keepalive 包
@@ -312,19 +307,4 @@ export {KeepAliveLayout}
 
 `LayoutInstance` 的数据在 `KeepAliveLayout.tsx` 的文件里初始化时被设置。
 
-
 ## 七、
-
-
-
-
-
-
-
-
-
-
-
-
-
-
