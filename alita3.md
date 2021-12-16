@@ -68,7 +68,7 @@
 
 ### 2、addExtraBabelPlugins 配置额外的 babel plugin
 
-这个配置是 `umi4` 新增的插件 API，使用方式可以参考 `umijs/father` 库下的 [extraBabelPlugins](https://github.com/umijs/father#extrababelplugins)
+这个配置是 `umi4` 新增的插件 API(不算新增,参考[modifyBabelPresetOpts](https://umijs.org/zh-CN/plugins/api#modifybabelpresetopts))，使用方式可以参考 `umijs/father` 库下的 [extraBabelPlugins](https://github.com/umijs/father#extrababelplugins)
 
 通过 [antd-mobile 官网迁移指南](https://mobile.ant.design/zh/guide/migration) 可知，官网为 `v2` 发了一个影子包，所以我们可以直接给 `antd-mobile-v2` 增加按需加载的配置。
 
@@ -84,3 +84,62 @@
 通过 `memo.resolve.alias.set` 优先设置用户自定义的 `antd-mobile-v2` 的版本。
 
 通过 `memo.resolve.alias.set` 设置 `antd-mobile` 的版本，如果是 `v5` 的版本或者用户配置了 `hd`，则直接使用 `2x` 分支。
+
+## 第四天
+
+阅读 `/packages/plugins/src/hd.ts`
+
+**hd 的插件的核心在于生成的临时文件的内容。**
+
+### 1、modifyDefaultConfig
+
+`hd` 的配置是 `obj` 对象。里面可传递 `theme`, `px2rem` 两个字段，这两个字段也是传递 `obj` 对象。
+
+对于 `hd` 下的内容，要整合进配置中。使用 [modifyDefaultConfig](https://umijs.org/zh-CN/plugins/api#modifydefaultconfig)
+
+先从方法出参中获取用户在 `config` 下的配置。然后通过 `api.userConfig.hd` 读取用户配置的 `hd` 数据(这里我觉得也可以从默认配置中获取到)。
+
+`extraPostCSSPlugins`: 是为了给 `configPx2rem` 追加 `px2rem`。
+
+通过阅读 `@alitajs/postcss-plugin-px2rem` [feat: support selectorDoubleRemList](https://github.com/alitajs/postcss-plugin-px2rem/commit/324d5eb00b408e51cca49ce8be40e362a8dfe282)
+可知，这个操作会将 `px` 转化为 2 倍的 `rem`。
+
+### 2、onGenerateFiles
+
+生成 `.umi` 下的临时文件。这份临时文件才是重点。
+
+### 3、addEntryImports
+
+`getFile` 方法很好理解，不细说(看源码)。
+
+想说为什么这个插件是用 `addEntryImports` 引入，而 `keepalive` 那些确是使用临时文件的方式通过 `React.createElement` 来引入。
+
+因为 `keepalive`、`mobileLayout` 是以组件的形式创建的，而 `hd` 是通过全局引入的。所以两者需求一致，但是开发方式不同。
+
+### 4、hd 临时文件
+
+#### `l23~l34`:
+
+> 有些兼容环境下, fontSize 为 100px 的时候, 结果 1rem=86px; 需要纠正 viewport;
+
+所以我们需要创建一个宽度为 `1rem` 的 `div`，去获取真实的 `width`，比较下大小的一致性。如果不一致，就需要 `viewport`。
+
+#### `l45~l63`:
+
+获取 `meta[name="viewport"]`，如果没有就创建一个。
+
+如果 `window != top` 说明是在 `iframe` 中打开 alita。
+
+获取 `initial-scale` 的值，重新设置给 `meta[name="viewport"]` 下的 `initial-scale`、`maximum-scale`、`minimum-scale`。
+
+这里有个疑问：在 `iframe` 中获取 `meta[name="viewport"]` 难道不会获取到 iframe 里的数据吗？
+
+#### `l66~l99`:
+
+处理屏幕缩放或者用户转动屏幕的情况。
+
+取宽高中较小的值，乘于页面比例，再乘于缩放值。就是当前屏幕需要的 `fontsize` 值。
+
+这里设置监听 `resize` 的意义是为了解决 `多次触发 resize 的情况，比如转动屏幕，有些手机会改变两次，有些只有一次` 的情况。
+
+如果有弹出软键盘：`trueClient < 300` 也不纳入计算范围。
