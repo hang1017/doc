@@ -50,6 +50,12 @@
 
 全部导出 `@alita/alita-layout/package` 用于获取 layout 下的类型定义等。
 
+及在 `.umi/core/umiExports.ts` 下自动引入这些内容。
+
+### 3、怎么实现全局 layout?
+
+`umi4` 引入 `addLayouts` 的插件，能够使文件成为 `layout`。
+
 ## 第三天
 
 阅读 `/packages/plugins/src/antdmobile.ts`
@@ -143,3 +149,57 @@
 这里设置监听 `resize` 的意义是为了解决 `多次触发 resize 的情况，比如转动屏幕，有些手机会改变两次，有些只有一次` 的情况。
 
 如果有弹出软键盘：`trueClient < 300` 也不纳入计算范围。
+
+## 第五天
+
+阅读 `/packages/plugins/src/keepalive.ts`
+
+在业务项目中 `/src/.umi/plugin-keepalive` 下写入两个临时文件。
+
+添加运行时插件 [addRuntimePlugin](https://umijs.org/zh-CN/plugins/api#addruntimeplugin)。
+
+使用 `react-route6` 的功能。
+
+先描述实现整体思路：
+
+- 如果存在 keepalive 页面，则页面不销毁，隐藏起来。
+- 通过 `Context.Provider` 传递配置 `keepalive` 数据。
+- 使用 `useRef` 对已打开的 `keepalive` 页面元素进行存储。
+
+---
+
+- `useOutlet`: 类似 `children`, 可以通过 `const element = useOutlet();` 获取当前页面元素。
+- `useLocation`: 通过使用 `const location = useLocation();` 获取 url 上的数据。
+
+## 第六天
+
+阅读 `/packages/plugins/src/aconsole.ts`
+
+`aconsole` 的配置下有 `console` 和 `inspx` 两个参数，这两个参数都为 `obj` 类型。
+
+分别配置对应的参数获取不同的功能。先看下 `console`
+
+这里走三个步骤：
+
+1、使用 `addHTMLStyles` 固定 `vConsole` 的样式。
+
+2、使用 `addEntryImports` 导入 `vConsole` 的压缩文件。并命名为 `VConsole`。
+
+3、使用 [`addEntryCode`](https://umijs.org/zh-CN/plugins/api#addentrycode) 在文件入口最后添加代码。引入 `VConsole` 并将配置数据作为入参。
+
+接下来看 `inspx`：
+
+判断运行环境，如果为开发环境或者强制指定 `production` 才会使用 `inspx`：
+
+写入两个临时文件。
+
+最后使用 [`addRuntimePlugin`](https://umijs.org/zh-CN/plugins/api#addruntimeplugin) 执行该插件。
+
+参考 `inspx` git 使用教程，可以使用懒加载的方法加载 `inspx`。
+
+这里有个疑问：下面这两行代码的作用是什么。
+
+```js
+const event = new CustomEvent("inspxswitch");
+window.dispatchEvent(event);
+```
