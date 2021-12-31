@@ -183,7 +183,7 @@
 
 1、使用 `addHTMLStyles` 固定 `vConsole` 的样式。
 
-2、使用 `addEntryImports` 导入 `vConsole` 的压缩文件。并命名为 `VConsole`。
+2、使用 `addEntryImports` 导入 `vConsole` 的压缩文件，**并追加到 `.umi/umi.ts` 文件下**。并命名为 `VConsole`。
 
 3、使用 [`addEntryCode`](https://umijs.org/zh-CN/plugins/api#addentrycode) 在文件入口最后添加代码。引入 `VConsole` 并将配置数据作为入参。
 
@@ -203,3 +203,96 @@
 const event = new CustomEvent("inspxswitch");
 window.dispatchEvent(event);
 ```
+
+可以看下[小虎 Oni-知识星球](https://wx.zsxq.com/dweb2/index/topic_detail/581522522811184)的详细讲解，粗略讲解如下：
+
+当监听事件被定义在被引入的某个库时，我们可以通过创建 `const event = new CustomEvent('监听名称');` 并执行 `window.dispatchEvent(event);` 来出发监听事件。
+
+`CustomEvent`：创建为用户出于任何目的而自定义的事件。并支持手动出发触发。
+
+## 第七天
+
+阅读 `/packages/plugins/src/request.ts`
+
+这个插件的作用：内置 `ahooks` 的库，固定 `ahooks` 的版本，若用户显式安装了自定义的版本号，则用户安装的版本号优先。
+
+`request` 引用 `@alita/request` 下的包，`useRequest` 引用业务项目中安装的 `ahooks` 的包。
+
+好处：帮用户内置掉 `ahooks` 这个库，减少用户自行安装 `umi-request` 和 `ahooks` 这两个库。
+
+这个文件的阅读就到这里，主要的要可以看下 `/packages/request/src/index.ts`。
+
+接下来可以看下 `运行时配置` 的内容[feat: support runtime config](https://github.com/alitajs/alita/commit/8339c2a577d25c78ee3afcd8c63c57faa9fb8e92)：
+
+## 第八天
+
+### 1、什么是运行时配置？
+
+`addRuntimePluginKey`
+
+申明在 `app.ts` 里面可以使用某个配置，就像 `api.describe` 一样，声明 `config` 中多了什么配置。
+
+`enableby`
+
+开启当前插件的规则。
+
+- config: 是可以根据 `modifyDefaultConfig` 等修改配置的 api 动态修改后启用或关闭。
+- register: 就是用户写在 `config.ts` 或者 `umirc.ts` 下的配置。
+- function: 可以自己判断开启时机，比如使用一些环境变量开启插件等就可以在这里判断。
+
+### 2、阅读 [`Umi-next 源码阅读——插件机制`](https://www.yuque.com/docs/share/ad434e5a-79f9-4705-a12a-34e2d3a4dcc8?#)
+
+整体流程如下：
+
+#### （1）、init
+
+加载各类配置信息，维护相应的子成员。
+
+通过运行打印日志消息可以得到以下信息：
+
+- `cwd`: 绝对路径
+- `env`: 项目启动环境
+- `args._`: 命令行参数
+- `configManager`: 配置文件的路径、默认配置文件列表、`opts` 等信息。
+- `userConfig`: 用户在配置文件下注册的数据，如 `config.ts`，`umirc.ts`
+
+通过 `getPluginsAndPresets` 获取项目中完整的 `plugins` 和 `presets`。
+
+主要通过 4 个地方进行数据的获取：
+
+- opts
+- env: 环境变量可以添加
+- dependencies: umi 扫描符合插件命名的文件
+- config
+
+#### （2）、initPresets
+
+在看这个内容之前，需要先知道 `presets` 和 `plugins` 的区别。
+
+两者都为插件，`presets` 为内部文件，`plugins` 为外部插件的库。
+
+注册 `presets`，获取 `config` 配置下的 `presets` 和 `plugins`；`plugins` 放队尾；`presets` 放队首(保证它们之间的相对顺序和关系)。
+
+#### （3）、initPlugins
+
+注册 `plugins`，
+
+#### （4）、resloveConfig
+
+整理各个插件对于 `config schema` 的定义。然后执行插件。
+
+#### （5）、collectionAppData
+
+执行 `modifyAppData` 的 hook 来维护 app 的元数据。
+
+#### （6）、onCheck
+
+执行 onCheck hook
+
+#### （7）、onStart
+
+执行 onStart hook
+
+#### （8）、runCommand
+
+运行当前 cli 要执行的 command
