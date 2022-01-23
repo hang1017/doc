@@ -252,7 +252,7 @@ window.dispatchEvent(event);
 
 - `cwd`: 绝对路径
 - `env`: 项目启动环境
-- `args._`: 命令行参数
+- `args._`: 命令行参数。是通过使用 yParser 解析的命令后面携带的参数，常常我们会遇到如 `alita g page —explt=false` 这样的命令，`args` 就是除了 alita 后面的所有参数都有。
 - `configManager`: 配置文件的路径、默认配置文件列表、`opts` 等信息。
 - `userConfig`: 用户在配置文件下注册的数据，如 `config.ts`，`umirc.ts`
 
@@ -296,3 +296,104 @@ window.dispatchEvent(event);
 #### （8）、runCommand
 
 运行当前 cli 要执行的 command
+
+## 第九天
+
+阅读 `packages/create-alita/src`
+
+这个包的功能用于创建 app 和 plugin 模版。
+
+`.cli.ts` 文件大致的内容就是判断命令行的准确性。并且调用 `index.ts` 的方法。
+
+`args` 是通过使用 `yParser` 解析的命令后面携带的参数，常常我们会遇到如 `alita g page —explt=false` 这样的命令，`args` 就是除了 alita 后面的所有参数都有。
+
+这里的 `args.default` 为了测试的时候，跳过 `prompts`。用户真实在创建 `alita` 项目时，是真的需要在终端一步步选择执行的。
+
+剩下的重点在于 `BaseGenerator` 这里的内容，方法功能为执行模版复制的功能。后面细说，现在先来看下 `./index.test.ts` 的内容。
+
+分别测试 创建项目和创建插件项目的方法。执行 `./index.ts` 文件，确认 `fixtures` 包下是否成功生成项目。
+
+阅读 `BaseGenerator`
+
+该功能的作用在于创建模版文件。
+
+先解释 4 个入参：
+
+- path：模版文件路径。
+- target：目标路径。
+- data：参数，比如模版的某些自定义的属性，用于替换模版的内容。
+- questions：命令行执行异步的 questions。
+
+进入核心代码，设计思路如下：
+
+如果 `path` 是文件夹，则 `copy` 整个文件夹的内容到 `target` 上。
+
+如果 `path` 是带 `tpl` 文件，说明要拷贝模版，记得带上包含 `data` 的 `context` 用于替换模版内容。
+
+如果不是上面两种文件类型，则在业务项目上，创建同名文件，`copy` 内容。
+
+## 第十天
+
+dform:
+
+完成 Grid 组件的开发。主要是为了学习 ts 的内容。
+
+首先熟悉 Record 。
+
+```ts
+interface PageInfo {
+  title: string;
+}
+
+type Page = "home" | "about" | "contact";
+
+const nav: Record<Page, PageInfo> = {
+  about: { title: "about" },
+  contact: { title: "contact" },
+  home: { title: "home" },
+};
+```
+
+通过上面的代码可以看到 `Record` 后面的泛型就是对象键和值的类型。
+
+然后看下 dform 的使用：
+
+```ts
+export interface NativeProps<S extends string = never> {
+  className?: string;
+  style?: CSSProperties & Partial<Record<S, string>>;
+  tabIndex?: number;
+}
+```
+
+这里的 `S` 是定义了一个范型，用户在使用 `NativeProps` 是可以通过 `NativeProps<'aa' | 'bb'>` 给 `S` 赋值。
+
+使用场景如下：用户多次使用 `NativeProps` 但参数定义不相同的情况下可以使用。
+
+`Partial`：将类型定义的所有属性都修改为可选。
+
+拿上面的例子来说，`style` 可以定义为 `CSSProperties`，也可以使用用户自定义的参数类型，但是用户定义的参数类型都为可选，并非必填项。所以使用 `Partial<Record<S, string>>`。
+
+最后一个定义 `never`。代表什么都没有，编译器用它来进行完整性检查。
+
+开发 `Grid`，`GridItem` 需要对两者进行兼容，实现 `const { Item } = Grid`。
+
+可以参考一下方法，并对该该方法进行讲解。
+
+```ts
+export function attachPropertiesToComponent<C, P extends Record<string, any>>(component: C, properties: P): C & P {
+  const ret = component as any;
+  for (const key in properties) {
+    if (properties.hasOwnProperty(key)) {
+      ret[key] = properties[key];
+    }
+  }
+  return ret;
+}
+```
+
+这里的 `C` 定义为组件，`P` 定义为 `key` 为 `string`, `value` 为 `any` 的对象。
+
+最后的 `: C & P` 代表这个函数有返回值，并且可以为 `C` 或者 `P` 类型。
+
+## 第十一天
