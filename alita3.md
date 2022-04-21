@@ -397,3 +397,14 @@ export function attachPropertiesToComponent<C, P extends Record<string, any>>(co
 最后的 `: C & P` 代表这个函数有返回值，并且可以为 `C` 或者 `P` 类型。
 
 ## 第十一天
+
+阅读 `packages/plugins/src/dva.ts`
+
+真的是完全看不懂，不过可以先从 `packages/plugins/src/utils/modelUtils.ts` 开始看。
+
+`ModelUtils` 下提供的四个方法：
+
+- `getAllModels`: 获取文件名为 `models` 下的所有文件，以及 `src` 下名为 `model` 的文件。功能就是获取所有 dva 模版。
+- `getModels`:
+- `isModelValid`:
+- `getModelsContent`:
