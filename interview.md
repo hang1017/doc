@@ -11,14 +11,18 @@ webpack 的面试题在同级目录下的 `webpack.md` 中的最下方。
 ```js
 function f1() {
   var n = 999;
-  addN = function() { n+=1 }
-  function f2() { alert(n) }
+  addN = function () {
+    n += 1;
+  };
+  function f2() {
+    alert(n);
+  }
   return f2;
 }
 var result = f1();
-result();         // 999
+result(); // 999
 addN();
-result();         // 1000
+result(); // 1000
 ```
 
 读取其他函数内部变量的函数。将函数内部和函数外部连通起来的一座桥梁。
@@ -60,23 +64,23 @@ result();         // 1000
 
 `var copyObj = Object.assign({}, obj);`
 
-(5)、有没有什么办法能够copy 所有的层级的对象和数组
+(5)、有没有什么办法能够 copy 所有的层级的对象和数组
 
 `var copyArr = JSON.parse(JSON.stringify(arry))`
 
-(6)、immutable解决方案
+(6)、immutable 解决方案
 
 深拷贝很消耗性能，有时我们只是想改变一个对象内的值不修改原对象，但是深拷贝就会造成资源浪费。
 
 ```js
 const { Map } require('immutable');
 const map1 = Map({ a: 1, b: 2, c: 3 });
-const map2 = map1.set(b: 100); 
+const map2 = map1.set(b: 100);
 ```
 
 ### 3、css 有哪些实现布局的方式
 
-- table布局
+- table 布局
 - flex
 - float
 - 响应式布局
@@ -86,9 +90,9 @@ media:
 ```css
 /* 如果文档小于 300px */
 @media screen and (max-width: 300px) {
-    body {
-        background-color:lightblue;
-    }
+  body {
+    background-color: lightblue;
+  }
 }
 ```
 
@@ -120,14 +124,13 @@ media:
 
 3、document.getElementByTagName('img')[0].setAttribute('style','width:300px !important');
 
-
 ### 7、['10', '10', '10', '10'].map(parseInt)
 
 实际向 `parseInt` 传递的是字符串和基数。
 
 所以其执行的效果是：
 
-- parseInt('10',0);  
+- parseInt('10',0);
 - parseInt('10',1);
 - parseInt('10',2);
 - parseInt('10',3);
@@ -142,18 +145,17 @@ media:
 
 `[102, 15, 22, 29, 3, 8]`
 
-根据 MDN 上对 `Array.sort()` 的解释，默认的排序会讲数组元素转换为字符串，比较字符串中 UTF-16编码顺序进行排序。
-
+根据 MDN 上对 `Array.sort()` 的解释，默认的排序会讲数组元素转换为字符串，比较字符串中 UTF-16 编码顺序进行排序。
 
 ### 10、打印对称树
 
 ```js
 var result = [];
-for(let i = 0;i< 10; i++) {
-  result.push(i*11);
-  for(let j = 0; j<10; j++) {
-    result.push(i*101 + j*10);
-    result.push(i*1001 + j*110);
+for (let i = 0; i < 10; i++) {
+  result.push(i * 11);
+  for (let j = 0; j < 10; j++) {
+    result.push(i * 101 + j * 10);
+    result.push(i * 1001 + j * 110);
   }
 }
 ```
@@ -166,7 +168,7 @@ for(let i = 0;i< 10; i++) {
 
 ### 1、react 的 key 有什么作用
 
-react 中 diff算法来保证每次组件的所有变动都能得到及时的更新，标准的Tree Diff算法复杂度为O(n3)，若组件中的元素数量过多的话，其性能是无法承受的。
+react 中 diff 算法来保证每次组件的所有变动都能得到及时的更新，标准的 Tree Diff 算法复杂度为 O(n3)，若组件中的元素数量过多的话，其性能是无法承受的。
 
 如果两个元素存在有不同的 `key`, 那么前后的两次的渲染就被认为是不同的元素，旧的元素被 `unmount`, 新的元素被 `mount`。
 
@@ -180,22 +182,22 @@ react 中 diff算法来保证每次组件的所有变动都能得到及时的更
 
 (2)、如何选择 key
 
-key 的真正目的是为了标识前后两次渲染中元素的对应关系。在插入，排序，删除操作时，原先的 index并不对应到原先的元素上，那么 key 就失去了意义。
+key 的真正目的是为了标识前后两次渲染中元素的对应关系。在插入，排序，删除操作时，原先的 index 并不对应到原先的元素上，那么 key 就失去了意义。
 
 参考下面的代码：
 
 ```js
 var key = 0;
 //可以是任何的id generator
-function id(){
-  return  String(++key);
+function id() {
+  return String(++key);
 }
 //任意的数组或者待遍历的数据
-data.forEach((item)=>{
-  if(!item.id){
+data.forEach((item) => {
+  if (!item.id) {
     item.id = id;
   }
-})
+});
 ```
 
 (3)、注意点
@@ -291,18 +293,20 @@ react15 生命周期
 
 - 弃用了 `componentWillMount`、`componentWillReceivePorps`，`componentWillUpdate`
 - 新增 `getDerivedStateFromProps`、`getSnapshotBeforeUpdate`
-- 17版本将会删除弃用的三个生命周期
+- 17 版本将会删除弃用的三个生命周期
 
 ### 6、shouldComponentUpdate 是做什么的？如何用？
 
-询问组件是否需要更新的一个钩子函数，判断数据是否需要重新渲染，返回一个布尔值。默认的返回值是true，需要重新render()。
+询问组件是否需要更新的一个钩子函数，判断数据是否需要重新渲染，返回一个布尔值。默认的返回值是 true，需要重新 render()。
 
-若如果返回值是false则不触发渲染,利用这个生命周期函数可以强制关闭不需要更新的子组件来提升渲染性能。
+若如果返回值是 false 则不触发渲染,利用这个生命周期函数可以强制关闭不需要更新的子组件来提升渲染性能。
 
 这个方法用来判断是否需要调用 render 方法重新描绘 dom。
 
 因为 dom 的描绘非常消耗性能，如果我们能在 shouldComponentUpdate 方法中能够写出更优化的 dom diff 算法，可以极大的提高性能。
 
+## 四、babel
 
+### 1、babel 的实现原理
 
-
+通过将代码转换成抽象语法书(AST)，再转换成目标语法。
