@@ -4,7 +4,7 @@
 
 **先将文件夹【file】下的三个文件复制到你项目的根目录下。如果有可以忽略。**
 
-访问 [zcm 研发云](https://dev.iwhalecloud.com/portal/main.html?portalId=3&projectId=562574) 的链接进行登录。右上角选择 **fz_app** 的项目(如果没有的话，找郑敬勤或者陈申权帮忙增加权限)。
+访问 [zcm 研发云](https://dev.iwhalecloud.com/portal/main.html?portalId=3&projectId=562574) 的链接进行登录。右上角选择 **fz_app** 的项目(如果没有的话，找郑敬勤帮忙增加权限，或先咨询下陈申权)。
 
 进入项目后先切换
 
