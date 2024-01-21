@@ -1,27 +1,102 @@
 # vue study
 
-### 1、attribute 属性，响应式的绑定自定义属性：
+## 进阶学习
+
+#### 三、插件
+
+https://cn.vuejs.org/guide/reusability/plugins.html
+
+这个需要在认真看下。
+
+#### 二、自定义组件
+
+使用
 
 ```js
-<div v-bind:id='dynamicId'></div>
+const focus = { mounted: (el) => el.focus() }
 
-// 等同于
-<div :id='dynamicId' />
+export default {
+  directives: { focus }
+}
 
-// 绑定多个属性值
-const objectOfAttrs = {
-  id: 'container',
-  class: 'wrapper'
-};
-<div v-bind="objectOfAttrs" />
+<input v-focus />
 
-// js 表达式
-<div :id="`list-${id}`"/>
+// 全局使用
+app.directive('focus', {})
+```
 
-// 事件
-<div v-on:click="doSomething"/>
-// 等同于
-<div @click="doSomething"/>
+功能
+
+```js
+const myDirective = {
+  // 在绑定元素的 attribute 前
+  // 或事件监听器应用前调用
+  created(el, binding, vnode, prevVnode) {},
+  // 在元素被插入到 DOM 前调用
+  beforeMount() {},
+  // 在绑定元素的父组件及自己的所有子节点都挂在完成后调用
+  mounted() {},
+  // 绑定元素的父组件更新前调用
+  breforeUpdate(){},
+  // 在绑定元素的父组件及自己的所有子节点都更新后调用
+  updated() {},
+  // 绑定元素卸载前调用
+  beforeUnmount(){},
+  // 绑定元素卸载后调用
+  unmounted() {},
+}
+```
+
+- el: 指令绑定到的元素。这可以用于直接操作 DOM。
+- binding: 
+  - value: 传递给指令的值
+  - oldValue: 旧值
+  - arg: 传递给指令的参数
+  - modifiers: 一个包含修饰符的对象
+  - instance: 使用该指令的组件实例
+  - dir: 指令的定义对象
+- vnode: 绑定元素的底层VNode
+
+
+
+
+
+#### 一、异步组件
+
+`defineAsyncComponent`
+
+```js
+const AsyncComp = defineAsyncComponent(() => {
+  return new Promise((resolve, reject) => {
+    resolve();
+  });
+});
+
+const AsyncComp = defineAsyncComponent(() =>
+  import("./components/MyComponent.vue")
+);
+
+// 全局注册：
+app.component(
+  "MyComponent",
+  defineAsyncComponent(() => import("./a/a.vue"))
+);
+
+// 适配渲染错误的场景
+const AsyncComp = defineAsyncComponent({
+  loader: () => import('./Foo.vue'),
+  // 加载时渲染的组件
+  loadingComponent: LoadingComp,
+  // 展示架在组件前的延迟时间 默认 200ms
+  delay: 200,
+  errorComponent: ErrorComponent,
+  timeout: 3000
+})
+```
+
+## 初级学习
+
+## 1、attribute 属性，响应式的绑定自定义属性：
 
 // 动态参数
 <a v-bind=[attributeName]='url'>...</a>
@@ -32,7 +107,8 @@ const objectOfAttrs = {
 <a v-on=[eventName]='doSomething'>...</a>
 // 等同于
 <a @[eventName]='url'>...</a>
-```
+
+````
 
 ### 2、响应式基础
 
@@ -49,18 +125,18 @@ console.log(count.value);
 let count = $ref(0);
 // 取值
 console.log(count);
-```
+````
 
 ### 3、计算属性 computed
 
 ```js
 // 计算属性缓存
 const a = computed(() => {
-  return book.length > 0 ? 'yes' : 'no'
-})
+  return book.length > 0 ? "yes" : "no";
+});
 // 方法
 function b() {
-  return book.length > 0 ? 'yes' : 'no'
+  return book.length > 0 ? "yes" : "no";
 }
 ```
 
@@ -68,19 +144,19 @@ function b() {
 - 方法总会在重渲染发生时再次执行函数。
 
 ```js
-const firstName = ref('John')
-const lastName = ref('Doe')
+const firstName = ref("John");
+const lastName = ref("Doe");
 
 // 可写的计算属性
 // 通过 getter 和 setter 来创建
 const fullName = computed({
   get() {
-    return firstName.value + ' ' + lastName.value;
+    return firstName.value + " " + lastName.value;
   },
   set(newValue) {
-    [firstName.value, lastName.value] = newValue.split(' ');
-  }
-})
+    [firstName.value, lastName.value] = newValue.split(" ");
+  },
+});
 ```
 
 > getter 中不要做异步请求或者更改 DOM。
@@ -104,50 +180,6 @@ const classObj = reactive({
 
 // 通过 `$attrs` 来绑定动态的元素
 <p :class="$attrs.class"/>
-```
-
-### 5、条件渲染
-
-`v-if` 和 `v-show`
-
-`v-show`: 不论条件如何始终会被渲染。**不支持在 `template` 上使用。**
-
-`v-if`: 只有当条件为 `true` 时才会重建，否则会被销毁。
-
-### 6、列表渲染
-
-```js
-<li v-for="item in items">
-  {{ item.message }}
-</li>
-
-// 或
-<li v-for="(item, index) in items"/>
-
-// for 与对象
-<li v-for="(value, key) in myObj">
-{{ key }}: {{ value }}
-</li>
-```
-
-### 7、事件处理
-
-```js
-function greet(event) {
-
-}
-<div @click="greet"/>
-
-// 或
-
-function say(msg) {
-  alert(msg);
-}
-<div @click="say('aaa')"/>
-
-// 或
-<div @click="warnFun('aa', $event)"/>
-<div @click="(event) => warnFun('aa', event)"/>
 ```
 
 事件修饰符
@@ -175,24 +207,24 @@ function say(msg) {
 
 ```js
 // 可接受多个来源的数组
-watch([x, () => y.value], ([newX, newY]) => {})
+watch([x, () => y.value], ([newX, newY]) => {});
 
 /**
  * 深层监听器，支持对象内属性的监听
  * ps: 会监听所有层级的属性，若是大型数据结构，开销很大。
  */
-watch(obj, () => {}, { deep: true })
+watch(obj, () => {}, { deep: true });
 
 /**
  * 创建监听器时立即调用一遍
  */
-watch(source, () => {}, { immediate: true })
+watch(source, () => {}, { immediate: true });
 
 /**
  * 回调中访问 vue 更新后的 dom
  * 或者使用 watchPostEffect
  */
-watch(source, callback, { flush: 'post' })
+watch(source, callback, { flush: "post" });
 ```
 
 **`watchEffect`** 函数的优点
@@ -201,18 +233,19 @@ watch(source, callback, { flush: 'post' })
 - 会自动追踪 value 值作为依赖，不需要显式的定义
 - 比深度监听器效率好，只监听回调用中被使用到的属性，而不是递归跟踪所有属性
 
-
 ```js
 watchEffect(async () => {
-  const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${todoId.value}`);
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/todos/${todoId.value}`
+  );
   data.value = await response.json();
-})
+});
 ```
 
 监听器必须用同步语句创建，如果异步回调创建一个监听器，不会被绑定到当前的组件上，并且必须手动停止它。
 
 ```js
-const unwatch = watchEffect(() => {})
+const unwatch = watchEffect(() => {});
 
 unwatch();
 ```
@@ -250,7 +283,6 @@ emit('enlarge-text');
 
 ### 12、props
 
-
 一个对象绑定多个 props。下面的 post 是多个数据。
 
 `<Comp v-bind="post" />`
@@ -275,17 +307,19 @@ const emit = defineEmits(['update:modelValue']);
 
 ```js
 const value = computed({
-  get() { return props.modelValue },
-  set(value) { emit('update:modelValue', value) }
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit("update:modelValue", value);
+  },
 });
 
 <template>
   <input v-model="value" />
-</template>
+</template>;
 ```
 
 默认使用 `modelValue` 当作绑定的参数名，如果希望修改名称可以使用 `v-model:title="bookTitle`，触发使用 `update:title` 来更新父组件。
 
 并且支持多条 `v-model` 绑定，代码逻辑通同上。
-
-
