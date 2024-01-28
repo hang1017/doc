@@ -2,9 +2,82 @@
 
 ## 进阶学习
 
+#### 六、
+
+#### 五、组合式函数
+
+约定组合式函数以 `use` 开头，并用驼峰式命名
+
+如果传递进来的参数值是 `ref` 这种响应式的类型。
+
+请先使用 `import { toValue } from 'vue'; const value = toValut(vals);` 来实现。
+
+这里的内容很深，可以继续学习：https://cn.vuejs.org/guide/reusability/composables.html#conventions-and-best-practices
+
+#### 四、透传
+
+1、通过 `provice` 实现
+
+```js
+export default {
+  provide: {
+    message: "hello!",
+  },
+  // or
+  data() {
+    return {
+      message: "hello!",
+    };
+  },
+  provide() {
+    return {
+      message: this.message,
+    };
+  },
+};
+
+// 或者全局注入
+app.provide("message", "hello!");
+```
+
+> 但是这样不会使注入保持响应性。
+
+2、使用 `inject` 来声明：
+
+```js
+export default {
+  inject: ["message"],
+  created() {
+    console.log(this.messgae);
+  },
+};
+```
+
+> 注入会在组件自身的状态之前被解析，因此你可以在 `data()` 中访问到注入的属性。
+
+注入的方式和 `props` 的写法差不多，可以定义默认值和别名。
+
+3、使用 `computed` 来支持响应式
+
+```js
+export default {
+  provide() {
+    return {
+      message: computed(() => this.message),
+    };
+  },
+};
+```
+
 #### 三、插件
 
-https://cn.vuejs.org/guide/reusability/plugins.html
+1、通过 `app.vue(myPlugin, {})` 来引入插件。
+
+2、这个插件通过 `install(app, options) {}` 来实现。
+
+3、(延伸) 使用 `app.provide('i18n', options)` 将参数传递给整个应用。
+
+4、通过 `inject: ['i18n']` 和 `this.i18n.greetings.hello` 来实现。
 
 这个需要在认真看下。
 
@@ -37,29 +110,25 @@ const myDirective = {
   // 在绑定元素的父组件及自己的所有子节点都挂在完成后调用
   mounted() {},
   // 绑定元素的父组件更新前调用
-  breforeUpdate(){},
+  breforeUpdate() {},
   // 在绑定元素的父组件及自己的所有子节点都更新后调用
   updated() {},
   // 绑定元素卸载前调用
-  beforeUnmount(){},
+  beforeUnmount() {},
   // 绑定元素卸载后调用
   unmounted() {},
-}
+};
 ```
 
 - el: 指令绑定到的元素。这可以用于直接操作 DOM。
-- binding: 
+- binding:
   - value: 传递给指令的值
   - oldValue: 旧值
   - arg: 传递给指令的参数
   - modifiers: 一个包含修饰符的对象
   - instance: 使用该指令的组件实例
   - dir: 指令的定义对象
-- vnode: 绑定元素的底层VNode
-
-
-
-
+- vnode: 绑定元素的底层 VNode
 
 #### 一、异步组件
 
@@ -84,14 +153,14 @@ app.component(
 
 // 适配渲染错误的场景
 const AsyncComp = defineAsyncComponent({
-  loader: () => import('./Foo.vue'),
+  loader: () => import("./Foo.vue"),
   // 加载时渲染的组件
   loadingComponent: LoadingComp,
   // 展示架在组件前的延迟时间 默认 200ms
   delay: 200,
   errorComponent: ErrorComponent,
-  timeout: 3000
-})
+  timeout: 3000,
+});
 ```
 
 ## 初级学习
